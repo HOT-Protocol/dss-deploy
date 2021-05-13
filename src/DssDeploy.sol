@@ -26,12 +26,10 @@ import {Vat} from "dss/vat.sol";
 import {Jug} from "dss/jug.sol";
 import {Vow} from "dss/vow.sol";
 import {Cat} from "dss/cat.sol";
-import {Dog} from "dss/dog.sol";
 import {DaiJoin} from "dss/join.sol";
 import {Flapper} from "dss/flap.sol";
 import {Flopper} from "dss/flop.sol";
 import {Flipper} from "dss/flip.sol";
-import {Clipper} from "dss/clip.sol";
 import {Dai} from "dss/dai.sol";
 import {End} from "dss/end.sol";
 import {ESM} from "esm/ESM.sol";
@@ -67,14 +65,6 @@ contract CatFab {
         cat = new Cat(vat);
         cat.rely(owner);
         cat.deny(address(this));
-    }
-}
-
-contract DogFab {
-    function newDog(address owner, address vat) public returns (Dog dog) {
-        dog = new Dog(vat);
-        dog.rely(owner);
-        dog.deny(address(this));
     }
 }
 
@@ -116,14 +106,6 @@ contract FlipFab {
     }
 }
 
-contract ClipFab {
-    function newClip(address owner, address vat, address spotter, address dog, bytes32 ilk) public returns (Clipper clip) {
-        clip = new Clipper(vat, spotter, dog, ilk);
-        clip.rely(owner);
-        clip.deny(address(this));
-    }
-}
-
 contract SpotFab {
     function newSpotter(address owner, address vat) public returns (Spotter spotter) {
         spotter = new Spotter(vat);
@@ -149,8 +131,8 @@ contract EndFab {
 }
 
 contract ESMFab {
-    function newESM(address gov, address end, address proxy, uint min) public returns (ESM esm) {
-        esm = new ESM(gov, end, proxy, min);
+    function newESM(address gov, address end, address pit, uint min) public returns (ESM esm) {
+        esm = new ESM(gov, end, pit, min);
     }
 }
 
@@ -165,13 +147,11 @@ contract DssDeploy is DSAuth {
     JugFab     public jugFab;
     VowFab     public vowFab;
     CatFab     public catFab;
-    DogFab     public dogFab;
     DaiFab     public daiFab;
     DaiJoinFab public daiJoinFab;
     FlapFab    public flapFab;
     FlopFab    public flopFab;
     FlipFab    public flipFab;
-    ClipFab    public clipFab;
     SpotFab    public spotFab;
     PotFab     public potFab;
     EndFab     public endFab;
@@ -182,7 +162,6 @@ contract DssDeploy is DSAuth {
     Jug     public jug;
     Vow     public vow;
     Cat     public cat;
-    Dog     public dog;
     Dai     public dai;
     DaiJoin public daiJoin;
     Flapper public flap;
@@ -201,45 +180,34 @@ contract DssDeploy is DSAuth {
 
     struct Ilk {
         Flipper flip;
-        Clipper clip;
         address join;
     }
 
-    function addFabs1(
+    constructor(
         VatFab vatFab_,
         JugFab jugFab_,
         VowFab vowFab_,
         CatFab catFab_,
-        DogFab dogFab_,
         DaiFab daiFab_,
-        DaiJoinFab daiJoinFab_
-    ) public auth {
-        require(address(vatFab) == address(0), "Fabs 1 already saved");
-        vatFab = vatFab_;
-        jugFab = jugFab_;
-        vowFab = vowFab_;
-        catFab = catFab_;
-        dogFab = dogFab_;
-        daiFab = daiFab_;
-        daiJoinFab = daiJoinFab_;
-    }
-
-    function addFabs2(
+        DaiJoinFab daiJoinFab_,
         FlapFab flapFab_,
         FlopFab flopFab_,
         FlipFab flipFab_,
-        ClipFab clipFab_,
         SpotFab spotFab_,
         PotFab potFab_,
         EndFab endFab_,
         ESMFab esmFab_,
         PauseFab pauseFab_
-    ) public auth {
-        require(address(flapFab) == address(0), "Fabs 2 already saved");
+    ) public {
+        vatFab = vatFab_;
+        jugFab = jugFab_;
+        vowFab = vowFab_;
+        catFab = catFab_;
+        daiFab = daiFab_;
+        daiJoinFab = daiJoinFab_;
         flapFab = flapFab_;
         flopFab = flopFab_;
         flipFab = flipFab_;
-        clipFab = clipFab_;
         spotFab = spotFab_;
         potFab = potFab_;
         endFab = endFab_;
@@ -252,8 +220,6 @@ contract DssDeploy is DSAuth {
     }
 
     function deployVat() public auth {
-        require(address(vatFab) != address(0), "Missing Fabs 1");
-        require(address(flapFab) != address(0), "Missing Fabs 2");
         require(address(vat) == address(0), "VAT already deployed");
         vat = vatFab.newVat(address(this));
         spotter = spotFab.newSpotter(address(this), address(vat));
@@ -307,20 +273,16 @@ contract DssDeploy is DSAuth {
 
         // Deploy
         cat = catFab.newCat(address(this), address(vat));
-        dog = dogFab.newDog(address(this), address(vat));
 
         // Internal references set up
         cat.file("vow", address(vow));
-        dog.file("vow", address(vow));
 
         // Internal auth
         vat.rely(address(cat));
-        vat.rely(address(dog));
         vow.rely(address(cat));
-        vow.rely(address(dog));
     }
 
-    function deployEnd() public auth {
+    function deployShutdown(address gov, address pit, uint256 min) public auth {
         require(address(cat) != address(0), "Missing previous step");
 
         // Deploy
@@ -329,7 +291,6 @@ contract DssDeploy is DSAuth {
         // Internal references set up
         end.file("vat", address(vat));
         end.file("cat", address(cat));
-        end.file("dog", address(dog));
         end.file("vow", address(vow));
         end.file("pot", address(pot));
         end.file("spot", address(spotter));
@@ -337,10 +298,13 @@ contract DssDeploy is DSAuth {
         // Internal auth
         vat.rely(address(end));
         cat.rely(address(end));
-        dog.rely(address(end));
         vow.rely(address(end));
         pot.rely(address(end));
         spotter.rely(address(end));
+
+        // Deploy ESM
+        esm = esmFab.newESM(gov, address(end), address(pit), min);
+        end.rely(address(esm));
     }
 
     function deployPause(uint delay, address authority) public auth {
@@ -351,7 +315,6 @@ contract DssDeploy is DSAuth {
 
         vat.rely(address(pause.proxy()));
         cat.rely(address(pause.proxy()));
-        dog.rely(address(pause.proxy()));
         vow.rely(address(pause.proxy()));
         jug.rely(address(pause.proxy()));
         pot.rely(address(pause.proxy()));
@@ -361,16 +324,7 @@ contract DssDeploy is DSAuth {
         end.rely(address(pause.proxy()));
     }
 
-    function deployESM(address gov, uint256 min) public auth {
-        require(address(pause) != address(0), "Missing previous step");
-
-        // Deploy ESM
-        esm = esmFab.newESM(gov, address(end), address(pause.proxy()), min);
-        end.rely(address(esm));
-        vat.rely(address(esm));
-    }
-
-    function deployCollateralFlip(bytes32 ilk, address join, address pip) public auth {
+    function deployCollateral(bytes32 ilk, address join, address pip) public auth {
         require(ilk != bytes32(""), "Missing ilk name");
         require(join != address(0), "Missing join address");
         require(pip != address(0), "Missing pip address");
@@ -391,43 +345,12 @@ contract DssDeploy is DSAuth {
         cat.rely(address(ilks[ilk].flip));
         ilks[ilk].flip.rely(address(cat));
         ilks[ilk].flip.rely(address(end));
-        ilks[ilk].flip.rely(address(esm));
         ilks[ilk].flip.rely(address(pause.proxy()));
-    }
-
-    function deployCollateralClip(bytes32 ilk, address join, address pip, address calc) public auth {
-        require(ilk != bytes32(""), "Missing ilk name");
-        require(join != address(0), "Missing join address");
-        require(pip != address(0), "Missing pip address");
-        require(calc != address(0), "Missing calc address");
-        require(address(pause) != address(0), "Missing previous step");
-
-        // Deploy
-        ilks[ilk].clip = clipFab.newClip(address(this), address(vat), address(spotter), address(dog), ilk);
-        ilks[ilk].join = join;
-        Spotter(spotter).file(ilk, "pip", address(pip)); // Set pip
-
-        // Internal references set up
-        dog.file(ilk, "clip", address(ilks[ilk].clip));
-        ilks[ilk].clip.file("vow", address(vow));
-        ilks[ilk].clip.file("calc", calc);
-        vat.init(ilk);
-        jug.init(ilk);
-
-        // Internal auth
-        vat.rely(join);
-        vat.rely(address(ilks[ilk].clip));
-        dog.rely(address(ilks[ilk].clip));
-        ilks[ilk].clip.rely(address(dog));
-        ilks[ilk].clip.rely(address(end));
-        ilks[ilk].clip.rely(address(esm));
-        ilks[ilk].clip.rely(address(pause.proxy()));
     }
 
     function releaseAuth() public auth {
         vat.deny(address(this));
         cat.deny(address(this));
-        dog.deny(address(this));
         vow.deny(address(this));
         jug.deny(address(this));
         pot.deny(address(this));
@@ -440,9 +363,5 @@ contract DssDeploy is DSAuth {
 
     function releaseAuthFlip(bytes32 ilk) public auth {
         ilks[ilk].flip.deny(address(this));
-    }
-
-    function releaseAuthClip(bytes32 ilk) public auth {
-        ilks[ilk].clip.deny(address(this));
     }
 }
