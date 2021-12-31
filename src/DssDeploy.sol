@@ -174,7 +174,7 @@ contract DssDeploy is DSAuth {
 
     mapping(bytes32 => Ilk) public ilks;
 
-    uint8 public step = 0;
+    uint8 constant public step = 0;
 
     uint256 constant ONE = 10 ** 27;
 
