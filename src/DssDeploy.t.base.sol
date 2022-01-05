@@ -252,7 +252,7 @@ contract DssDeployTestBase is DSTest, ProxyActions {
     uint256 constant RAY = 10 ** 27;
     uint256 constant RAD = 10 ** 45;
     function mul(uint x, uint y) internal pure returns (uint z) {
-        require(y == 0 || (z = x * y) / y == x);
+        require(y == 0 || (z = x * y) / y == x, "DssDeployTestBase/mul-overflow");
     }
 
     function setUp() public {
