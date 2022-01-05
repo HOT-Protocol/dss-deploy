@@ -69,7 +69,7 @@ contract CatFab {
 }
 
 contract DaiFab {
-    function newDai(uint chainId) public returns (Dai dai) {
+    function newDai(uint256 chainId) public returns (Dai dai) {
         dai = new Dai(chainId);
         dai.rely(msg.sender);
         dai.deny(address(this));
@@ -131,13 +131,13 @@ contract EndFab {
 }
 
 contract ESMFab {
-    function newESM(address gov, address end, address pit, uint min) public returns (ESM esm) {
+    function newESM(address gov, address end, address pit, uint256 min) public returns (ESM esm) {
         esm = new ESM(gov, end, pit, min);
     }
 }
 
 contract PauseFab {
-    function newPause(uint delay, address owner, address authority) public returns(DSPause pause) {
+    function newPause(uint256 delay, address owner, address authority) public returns(DSPause pause) {
         pause = new DSPause(delay, owner, authority);
     }
 }
@@ -215,7 +215,7 @@ contract DssDeploy is DSAuth {
         pauseFab = pauseFab_;
     }
 
-    function rad(uint wad) internal pure returns (uint) {
+    function rad(uint256 wad) internal pure returns (uint256) {
         return wad * 10 ** 27;
     }
 
@@ -307,7 +307,7 @@ contract DssDeploy is DSAuth {
         end.rely(address(esm));
     }
 
-    function deployPause(uint delay, address authority) public auth {
+    function deployPause(uint256 delay, address authority) public auth {
         require(address(dai) != address(0), "Missing previous step");
         require(address(end) != address(0), "Missing previous step");
 

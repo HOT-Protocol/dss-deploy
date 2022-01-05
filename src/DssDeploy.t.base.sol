@@ -13,9 +13,9 @@ interface Hevm {
 }
 
 interface AuctionLike {
-    function tend(uint, uint, uint) external;
-    function dent(uint, uint, uint) external;
-    function deal(uint) external;
+    function tend(uint256, uint256, uint256) external;
+    function dent(uint256, uint256, uint256) external;
+    function deal(uint256) external;
 }
 
 interface HopeLike {
@@ -30,24 +30,24 @@ contract FakeUser {
         DSToken(token).approve(guy);
     }
 
-    function doDaiJoin(address obj, address urn, uint wad) public {
+    function doDaiJoin(address obj, address urn, uint256 wad) public {
         DaiJoin(obj).join(urn, wad);
     }
 
-    function doDaiExit(address obj, address guy, uint wad) public {
+    function doDaiExit(address obj, address guy, uint256 wad) public {
         DaiJoin(obj).exit(guy, wad);
     }
 
-    function doWethJoin(address obj, address gem, address urn, uint wad) public {
-        WETH(obj).approve(address(gem), uint(-1));
+    function doWethJoin(address obj, address gem, address urn, uint256 wad) public {
+        WETH(obj).approve(address(gem), uint256(-1));
         GemJoin(gem).join(urn, wad);
     }
 
-    function doFrob(address obj, bytes32 ilk, address urn, address gem, address dai, int dink, int dart) public {
+    function doFrob(address obj, bytes32 ilk, address urn, address gem, address dai, int256 dink, int256 dart) public {
         Vat(obj).frob(ilk, urn, gem, dai, dink, dart);
     }
 
-    function doFork(address obj, bytes32 ilk, address src, address dst, int dink, int dart) public {
+    function doFork(address obj, bytes32 ilk, address src, address dst, int256 dink, int256 dart) public {
         Vat(obj).fork(ilk, src, dst, dink, dart);
     }
 
@@ -55,15 +55,15 @@ contract FakeUser {
         HopeLike(obj).hope(guy);
     }
 
-    function doTend(address obj, uint id, uint lot, uint bid) public {
+    function doTend(address obj, uint256 id, uint256 lot, uint256 bid) public {
         AuctionLike(obj).tend(id, lot, bid);
     }
 
-    function doDent(address obj, uint id, uint lot, uint bid) public {
+    function doDent(address obj, uint256 id, uint256 lot, uint256 bid) public {
         AuctionLike(obj).dent(id, lot, bid);
     }
 
-    function doDeal(address obj, uint id) public {
+    function doDeal(address obj, uint256 id) public {
         AuctionLike(obj).deal(id);
     }
 
@@ -85,7 +85,7 @@ contract ProxyActions {
         address      usr = address(govActions);
         bytes32      tag;  assembly { tag := extcodehash(usr) }
         bytes memory fax = abi.encodeWithSignature("rely(address,address)", from, to);
-        uint         eta = now;
+        uint256         eta = now;
 
         pause.plot(usr, tag, fax, eta);
         pause.exec(usr, tag, fax, eta);
@@ -95,7 +95,7 @@ contract ProxyActions {
         address      usr = address(govActions);
         bytes32      tag;  assembly { tag := extcodehash(usr) }
         bytes memory fax = abi.encodeWithSignature("deny(address,address)", from, to);
-        uint         eta = now;
+        uint256         eta = now;
 
         pause.plot(usr, tag, fax, eta);
         pause.exec(usr, tag, fax, eta);
@@ -105,7 +105,7 @@ contract ProxyActions {
         address      usr = address(govActions);
         bytes32      tag;  assembly { tag := extcodehash(usr) }
         bytes memory fax = abi.encodeWithSignature("file(address,bytes32,uint256)", who, what, data);
-        uint         eta = now;
+        uint256         eta = now;
 
         pause.plot(usr, tag, fax, eta);
         pause.exec(usr, tag, fax, eta);
@@ -115,7 +115,7 @@ contract ProxyActions {
         address      usr = address(govActions);
         bytes32      tag;  assembly { tag := extcodehash(usr) }
         bytes memory fax = abi.encodeWithSignature("file(address,bytes32,bytes32,uint256)", who, ilk, what, data);
-        uint         eta = now;
+        uint256         eta = now;
 
         pause.plot(usr, tag, fax, eta);
         pause.exec(usr, tag, fax, eta);
@@ -125,7 +125,7 @@ contract ProxyActions {
         address      usr = address(govActions);
         bytes32      tag;  assembly { tag := extcodehash(usr) }
         bytes memory fax = abi.encodeWithSignature("dripAndFile(address,bytes32,uint256)", who, what, data);
-        uint         eta = now;
+        uint256         eta = now;
 
         pause.plot(usr, tag, fax, eta);
         pause.exec(usr, tag, fax, eta);
@@ -135,7 +135,7 @@ contract ProxyActions {
         address      usr = address(govActions);
         bytes32      tag;  assembly { tag := extcodehash(usr) }
         bytes memory fax = abi.encodeWithSignature("dripAndFile(address,bytes32,bytes32,uint256)", who, ilk, what, data);
-        uint         eta = now;
+        uint256         eta = now;
 
         pause.plot(usr, tag, fax, eta);
         pause.exec(usr, tag, fax, eta);
@@ -145,7 +145,7 @@ contract ProxyActions {
         address      usr = address(govActions);
         bytes32      tag;  assembly { tag := extcodehash(usr) }
         bytes memory fax = abi.encodeWithSignature("cage(address)", end);
-        uint         eta = now;
+        uint256         eta = now;
 
         pause.plot(usr, tag, fax, eta);
         pause.exec(usr, tag, fax, eta);
@@ -155,27 +155,27 @@ contract ProxyActions {
         address      usr = address(govActions);
         bytes32      tag;  assembly { tag := extcodehash(usr) }
         bytes memory fax = abi.encodeWithSignature("setAuthority(address,address)", pause, newAuthority);
-        uint         eta = now;
+        uint256         eta = now;
 
         pause.plot(usr, tag, fax, eta);
         pause.exec(usr, tag, fax, eta);
     }
 
-    function setDelay(uint newDelay) external {
+    function setDelay(uint256 newDelay) external {
         address      usr = address(govActions);
         bytes32      tag;  assembly { tag := extcodehash(usr) }
         bytes memory fax = abi.encodeWithSignature("setDelay(address,uint256)", pause, newDelay);
-        uint         eta = now;
+        uint256         eta = now;
 
         pause.plot(usr, tag, fax, eta);
         pause.exec(usr, tag, fax, eta);
     }
 
-    function setAuthorityAndDelay(address newAuthority, uint newDelay) external {
+    function setAuthorityAndDelay(address newAuthority, uint256 newDelay) external {
         address      usr = address(govActions);
         bytes32      tag;  assembly { tag := extcodehash(usr) }
         bytes memory fax = abi.encodeWithSignature("setAuthorityAndDelay(address,address,uint256)", pause, newAuthority, newDelay);
-        uint         eta = now;
+        uint256         eta = now;
 
         pause.plot(usr, tag, fax, eta);
         pause.exec(usr, tag, fax, eta);
@@ -251,7 +251,7 @@ contract DssDeployTestBase is DSTest, ProxyActions {
     uint256 constant WAD = 10 ** 18;
     uint256 constant RAY = 10 ** 27;
     uint256 constant RAD = 10 ** 45;
-    function mul(uint x, uint y) internal pure returns (uint z) {
+    function mul(uint256 x, uint256 y) internal pure returns (uint256 z) {
         require(y == 0 || (z = x * y) / y == x, "DssDeployTestBase/mul-overflow");
     }
 
@@ -302,7 +302,7 @@ contract DssDeployTestBase is DSTest, ProxyActions {
         hevm.warp(0);
     }
 
-    function rad(uint wad) internal pure returns (uint) {
+    function rad(uint256 wad) internal pure returns (uint256) {
         return wad * 10 ** 27;
     }
 
@@ -339,19 +339,19 @@ contract DssDeployTestBase is DSTest, ProxyActions {
         dssDeploy.deployCollateral("COL", address(colJoin), address(pipCOL));
 
         // Set Params
-        this.file(address(vat), bytes32("Line"), uint(10000 * 10 ** 45));
-        this.file(address(vat), bytes32("ETH"), bytes32("line"), uint(10000 * 10 ** 45));
-        this.file(address(vat), bytes32("COL"), bytes32("line"), uint(10000 * 10 ** 45));
+        this.file(address(vat), bytes32("Line"), uint256(10000 * 10 ** 45));
+        this.file(address(vat), bytes32("ETH"), bytes32("line"), uint256(10000 * 10 ** 45));
+        this.file(address(vat), bytes32("COL"), bytes32("line"), uint256(10000 * 10 ** 45));
 
-        pipETH.poke(bytes32(uint(300 * 10 ** 18))); // Price 300 DAI = 1 ETH (precision 18)
-        pipCOL.poke(bytes32(uint(45 * 10 ** 18))); // Price 45 DAI = 1 COL (precision 18)
+        pipETH.poke(bytes32(uint256(300 * 10 ** 18))); // Price 300 DAI = 1 ETH (precision 18)
+        pipCOL.poke(bytes32(uint256(45 * 10 ** 18))); // Price 45 DAI = 1 COL (precision 18)
         (ethFlip,) = dssDeploy.ilks("ETH");
         (colFlip,) = dssDeploy.ilks("COL");
-        this.file(address(spotter), "ETH", "mat", uint(1500000000 ether)); // Liquidation ratio 150%
-        this.file(address(spotter), "COL", "mat", uint(1100000000 ether)); // Liquidation ratio 110%
+        this.file(address(spotter), "ETH", "mat", uint256(1500000000 ether)); // Liquidation ratio 150%
+        this.file(address(spotter), "COL", "mat", uint256(1100000000 ether)); // Liquidation ratio 110%
         spotter.poke("ETH");
         spotter.poke("COL");
-        (,,uint spot,,) = vat.ilks("ETH");
+        (,,uint256 spot,,) = vat.ilks("ETH");
         assertEq(spot, 300 * RAY * RAY / 1500000000 ether);
         (,, spot,,) = vat.ilks("COL");
         assertEq(spot, 45 * RAY * RAY / 1100000000 ether);
